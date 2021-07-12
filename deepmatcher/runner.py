@@ -221,6 +221,15 @@ class Runner(object):
             loss = float('NaN')
             if criterion:
                 loss = criterion(output, getattr(batch, label_attr))
+                if sample_weights != None:
+                    #test
+                    sample_weights_batch = []
+                    for idx, id in enumerate(getattr(batch, id_attr)):
+                        sample_weights_batch.append(sample_weights.get(id))
+                    sample_weights_tensor = torch.FloatTensor(sample_weights_batch)
+                    print('Multiply loss with sample weights')
+                    loss = loss * sample_weights_tensor
+                    loss = loss.mean()
 
             if hasattr(batch, label_attr):
                 scores = Runner._compute_scores(output, getattr(batch, label_attr))
@@ -252,13 +261,14 @@ class Runner(object):
                     loss.backward()
                 else:
                     #test
-                    sample_weights_batch = []
-                    for idx, id in enumerate(getattr(batch, id_attr)):
-                        sample_weights_batch.append(sample_weights.get(id))
-                    sample_weights_tensor = torch.FloatTensor(sample_weights_batch)
-                    print('Multiply loss with sample weights')
-                    loss = loss * sample_weights_tensor
-                    loss.mean().backward()
+                    #sample_weights_batch = []
+                    #for idx, id in enumerate(getattr(batch, id_attr)):
+                    #    sample_weights_batch.append(sample_weights.get(id))
+                    #sample_weights_tensor = torch.FloatTensor(sample_weights_batch)
+                    #print('Multiply loss with sample weights')
+                    #loss = loss * sample_weights_tensor
+                    #loss.mean().backward()
+                    loss.backward()
 
                 if not optimizer.params:
                     optimizer.set_parameters(model.named_parameters())
