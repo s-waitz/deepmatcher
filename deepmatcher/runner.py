@@ -155,6 +155,7 @@ class Runner(object):
              log_freq=5,
              sort_in_buckets=None,
              return_predictions=False,
+             sample_weights=None,
              **kwargs):
 
         if device is None:
@@ -246,7 +247,13 @@ class Runner(object):
 
             if train:
                 model.zero_grad()
-                loss.backward()
+                #test
+                if sample_weights == None:
+                    loss.backward()
+                else:
+                    print('Multiply loss with sample weights')
+                    loss = loss * sample_weights
+                    loss.mean().backward()
 
                 if not optimizer.params:
                     optimizer.set_parameters(model.named_parameters())
@@ -280,6 +287,7 @@ class Runner(object):
               label_smoothing=0.05,
               save_every_prefix=None,
               save_every_freq=1,
+              sample_weights=None,
               **kwargs):
         """run_train(model, train_dataset, validation_dataset, best_save_path,epochs=30, \
             criterion=None, optimizer=None, pos_neg_ratio=None, pos_weight=None, \
@@ -316,9 +324,15 @@ class Runner(object):
                 pos_weight = 2 * pos_neg_ratio / (1 + pos_neg_ratio)
 
             neg_weight = 2 - pos_weight
-
-            criterion = SoftNLLLoss(label_smoothing,
-                                    torch.Tensor([neg_weight, pos_weight]))
+            
+            #test
+            if sample_weights == None:
+                criterion = SoftNLLLoss(label_smoothing,
+                                        torch.Tensor([neg_weight, pos_weight]))
+            else:
+                criterion = SoftNLLLoss(label_smoothing,
+                                        torch.Tensor([neg_weight, pos_weight]),
+                                        reduction='none')
 
         optimizer = optimizer or Optimizer()
         if model.optimizer_state is not None:
@@ -335,8 +349,9 @@ class Runner(object):
 
         for epoch in epochs_range:
             model.epoch = epoch
+            #test sample_weights
             Runner._run(
-                'TRAIN', model, train_dataset, criterion, optimizer, train=True, **kwargs)
+                'TRAIN', model, train_dataset, criterion, optimizer, train=True, sample_weights=sample_weights, **kwargs)
 
             score = Runner._run('EVAL', model, validation_dataset, train=False, **kwargs)
 
