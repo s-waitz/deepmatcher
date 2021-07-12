@@ -227,10 +227,10 @@ class Runner(object):
                     for idx, id in enumerate(getattr(batch, id_attr)):
                         sample_weights_batch.append(sample_weights.get(id))
                     sample_weights_tensor = torch.FloatTensor(sample_weights_batch)
-                    print(sample_weights_tensor.to(device))
+                    #print(sample_weights_tensor.to(device))
                     sample_weights_tensor = sample_weights_tensor.to(device)
-                    print(sample_weights_tensor)
-                    print(loss)
+                    #print(sample_weights_tensor)
+                    #print(loss)
                     print('Multiply loss with sample weights')
                     loss = loss * sample_weights_tensor
                     loss = loss.mean()
