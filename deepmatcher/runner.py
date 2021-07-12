@@ -251,8 +251,13 @@ class Runner(object):
                 if sample_weights == None:
                     loss.backward()
                 else:
+                    #test
+                    sample_weights_batch = []
+                    for idx, id in enumerate(getattr(batch, id_attr)):
+                        sample_weights_batch.append(sample_weights.get(id_attr)
+                    sample_weights_tensor = torch.FloatTensor(sample_weights_batch)
                     print('Multiply loss with sample weights')
-                    loss = loss * sample_weights
+                    loss = loss * sample_weights_tensor
                     loss.mean().backward()
 
                 if not optimizer.params:
