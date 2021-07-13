@@ -231,7 +231,7 @@ class Runner(object):
                     sample_weights_tensor = sample_weights_tensor.to(device)
                     #print(sample_weights_tensor)
                     #print(loss)
-                    print('Multiply loss with sample weights')
+                    #print('Multiply loss with sample weights')
                     loss = loss * sample_weights_tensor
                     loss = loss.mean()
 
